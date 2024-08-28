@@ -5,19 +5,13 @@ import Utilities.ExcelUtility;
 import Utilities.GWD;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import Utilities.ExcelUtility;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WritingAllLaptopsToExcel {
     LocatorPage lp = new LocatorPage();
-    List<String> list=new ArrayList<>();
+    ArrayList<String> list=new ArrayList<>();
 
     @Given("Navigate to Blaze website")
     public void navigateToBlazeWebsite() {
@@ -39,36 +33,20 @@ public class WritingAllLaptopsToExcel {
         List<WebElement> listOfLaptops = lp.getListOfLaptops();
 
         for (WebElement e : listOfLaptops){
-            String strElement=e.getText().toString().substring(0,10);
+            String strElement=e.getText();
+            int endIndex = strElement.indexOf('$');
+            if (endIndex != -1) {
+                strElement = strElement.toString().substring(0, endIndex);
+            } else {
+                strElement=strElement.toString().substring(0,10);
+            }
             list.add(strElement);
         }
+        System.out.println(list);
 
-//        ExcelUtility.writeToExcel();
-    }
-
-
-    @And("Get list of laptops and write to the excel file in second page")
-    public void getListOfLaptopsAndWriteToTheExcelFileInSecondPage(DataTable dataTable) {
-
-        List<String> elementStr = dataTable.asList(String.class);
-        for (String strE : elementStr){
-            lp.waitUntilElementToBeClicable(lp.getWebElement(strE));
-        }
-
-        lp.waitUntilElementsToBeVisible(lp.getListOfLaptops());
-        List<WebElement> listOfLaptops = lp.getListOfLaptops();
-
-        for (int i = 0; i < list.size(); i++) {
-            for (WebElement e : listOfLaptops){
-                String strElement=e.getText().toString().substring(0,10);
-                if (!list.get(i).equals(strElement)) {
-                    list.add(strElement);
-                }
-            }
-        }
-
-        System.out.println("list = " + list);
-
-//        ExcelUtility.writeToExcel();
+        String path = "src/test/java/ExcelFiles/TableOfProducts.xlsx";
+        String listName = "LAPTOPS";
+        int listSize = list.size();
+        ExcelUtility.writeToExcel(path,list,listSize,listName);
     }
 }

@@ -39,26 +39,26 @@ public class ExcelUtility {
         return tablo;
     }
 
-    public static void writeToExcel(String path, Scenario senaryo) {
+    public static void writeToExcel(String path, ArrayList<String> list, int listSize,String listName) {
 
         File file = new File(path);
 
-        if (!file.exists()) // dosya yok ise, ilk kez ve 1 kez çalışır
-        {
-            //hafzada worbook oluştur, içinde hafızada sheet oluştur
+        if (!file.exists()) {
             XSSFWorkbook workbook = new XSSFWorkbook();
-            XSSFSheet sheet = workbook.createSheet("Sayfa1");
+            XSSFSheet sheet = workbook.createSheet(listName);
 
-            //hafızada işlemlerini yap
-            Row yeniSatir = sheet.createRow(0);
+            Row newRow = sheet.createRow(0);
+            Cell cell = newRow.createCell(1);
+            cell.setCellValue(listName);
+            for (int i = 0; i < listSize; i++) {
+                newRow = sheet.createRow(i+1);
+                Cell cell1 = newRow.createCell(0);
+                cell1.setCellValue(i+1);
+                Cell cell2 = newRow.createCell(1);
+                cell2.setCellValue(list.get(i));
+            }
 
-            Cell hucre = yeniSatir.createCell(0);
-            hucre.setCellValue(senaryo.getName());
 
-            Cell hucre2 = yeniSatir.createCell(1);
-            hucre2.setCellValue(senaryo.getStatus().toString());
-
-            //kaydet
             try {
                 FileOutputStream outputStream = new FileOutputStream(path);
                 workbook.write(outputStream);
@@ -81,14 +81,19 @@ public class ExcelUtility {
                 System.out.println("ex.getMessage() = " + ex.getMessage());
             }
 
-            int sonSatirIndex = sheet.getPhysicalNumberOfRows();
-            Row yeniSatir = sheet.createRow(sonSatirIndex);
+            int lastRowIndex = sheet.getPhysicalNumberOfRows();
+            Row newRow = sheet.createRow(lastRowIndex+2);
+            Cell cell = newRow.createCell(1);
+            cell.setCellValue(listName);
 
-            Cell hucre = yeniSatir.createCell(0);
-            hucre.setCellValue(senaryo.getName());
+            for (int i = 0; i < listSize; i++) {
+                newRow = sheet.createRow(lastRowIndex+3+i);
+                Cell cell1 = newRow.createCell(0);
+                cell1.setCellValue(i+1);
+                Cell cell2 = newRow.createCell(1);
+                cell2.setCellValue(list.get(i));
+            }
 
-            Cell hucre2 = yeniSatir.createCell(1);
-            hucre2.setCellValue(senaryo.getStatus().toString());
 
             try {
                 inputStream.close();
